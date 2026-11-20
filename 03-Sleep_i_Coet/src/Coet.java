@@ -2,52 +2,42 @@ import java.util.Scanner;
 
 public class Coet {
     static Scanner sc = new Scanner(System.in);
-    static Motor motor1 = new Motor(0);
-    static Motor motor2 = new Motor(1);
-    static Motor motor3 = new Motor(2);
-    static Motor motor4 = new Motor(3);
+    private final Motor[] motors = new Motor[4];
+
+    public Coet() {
+        for (int i = 0; i < motors.length; i++) { motors[i] = new Motor(i); }
+    }
+
     static boolean incrementar;
     static boolean stop = true;
     static boolean firstTime = true;
 
     public void passaAPotencia(int p) {
-        try {
-            if (p >= 0 && p <= 10) {
-                incrementar = (motor1.getPotenciaActual() < p);
-                motor1.setPotenciaObjectiu(p);
-                motor2.setPotenciaObjectiu(p);
-                motor3.setPotenciaObjectiu(p);
-                motor4.setPotenciaObjectiu(p);
-            }
-        } catch (Exception e) {
-            System.out.println("Potencia inválida, introduce un valor entre 0 i 10");
-            passaAPotencia(sc.nextInt());
-        }
+        if (p >= 0 && p <= 10) {
+            System.out.printf("Passant a potència %d%n", p);
+            for (Motor m : motors) { m.setPotenciaObjectiu(p); }
+        } else throw new IllegalArgumentException ("Potencia inválida, introduce un valor entre 0 i 10");
     }
 
     public void arranca() {
-        while (stop || firstTime) {
-            if (motor1.getPotenciaActual() + motor2.getPotenciaActual() + motor3.getPotenciaActual() + motor4.getPotenciaActual() == 0) {
-                if (stop) stop = false;
-                else firstTime = false; 
-            }
-            if (motor1.getPotenciaActual() < motor1.getPotenciaObjectiu()) {
-                if (incrementar) motor1.setPotenciaActual(1);
-                else motor1.setPotenciaActual(-1);
-            } if (motor2.getPotenciaActual() < motor2.getPotenciaObjectiu()) {
-                if (incrementar) motor2.setPotenciaActual(1);
-                else motor2.setPotenciaActual(-1);
-            } if (motor3.getPotenciaActual() < motor3.getPotenciaObjectiu()) {
-                if (incrementar) motor3.setPotenciaActual(1);
-                else motor3.setPotenciaActual(-1);
-            } if (motor4.getPotenciaActual() < motor4.getPotenciaObjectiu()) {
-                if (incrementar) motor4.setPotenciaActual(1);
-                else motor4.setPotenciaActual(-1);
-            }
+        for (Motor m : motors) {
+            m.start();
         }
     }
 
     public static void main(String[] args) {
-        
+        Coet coet = new Coet();
+        coet.arranca();
+
+        int p;
+        do {
+            p = sc.nextInt();
+            try {
+                coet.passaAPotencia(p);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                p = -1;
+            }
+        } while (p != 0);
     }
 }
